@@ -51,19 +51,15 @@ Built in C# using .NET 8, this project mixes practical automation features with 
 ---
 
 ## Folder Structure
-
+<pre>
 SmartHomeAssistant/
 ├── Program.cs
 ├── SmartHomeAssistant.csproj
 ├── Assets/
 │ └── turbanLoop.wav
-├── Audio/
-│ └── (cross-platform audio logic here)
-├── Voice/
-│ └── (speech synthesis logic here)
 ├── .gitignore
 ├── README.md
-
+</pre>
 ---
 
 ## How to Run

@@ -389,11 +389,13 @@ using System.Text;
 
             static string ValidatePassword(string password)
             {
+                if (password.Length < 8)
+                    return "Invalid: Must be at least 8 characters long.";
+
                 bool hasUpper = false;
                 bool hasLower = false;
                 bool hasDigit = false;
                 bool hasSpecial = false;
-                bool hasMinLength = password.Length >= 8;
 
                 foreach (char c in password)
                 {
@@ -404,15 +406,14 @@ using System.Text;
                 }
 
                 int criteriaMet = 0;
-                if (hasMinLength) criteriaMet++;
                 if (hasUpper) criteriaMet++;
                 if (hasLower) criteriaMet++;
                 if (hasDigit) criteriaMet++;
                 if (hasSpecial) criteriaMet++;
 
-                if (criteriaMet == 5)
+                if (criteriaMet == 4)
                     return "Strong";
-                else if (criteriaMet >= 3)
+                else if (criteriaMet >= 2)
                     return "Moderate";
                 else
                     return "Weak";
@@ -480,34 +481,45 @@ using System.Text;
                             Console.Clear();
                             ShowBanner("SAFE MODE - LOCKED");
                             PrintCentered($"Password: {customPassword}");
-                            PrintCentered($"Password Strength: {verdict}");
-                            Console.WriteLine(); // spacing
-                            PrintCentered("[1] Accept password");
-                            PrintCentered("[2] Try a different one");
-                            PrintCentered("[3] Back");
-                            WriteBottomPrompt();
-                            string acceptChoice = Console.ReadLine();
-
-                            if (acceptChoice == "1")
+                            if (verdict.StartsWith("Invalid:"))
                             {
-                                safeModePassword = customPassword;
-                                Speak("Password accepted. Returning to login.");
-                                Thread.Sleep(3000);
-                                return; // back to login
-                            }
-                            else if (acceptChoice == "2")
-                            {
-                                continue; // Loop back to password input
-                            }
-                            else if (acceptChoice == "3")
-                            {
-                                break; // Exit to main menu
+                                PrintCenteredAndSpeak($"HAL: {verdict}");
+                                Thread.Sleep(2000);
                             }
                             else
                             {
-                                Console.WriteLine("Invalid choice. Please try again.");
-                                Thread.Sleep(1500);
+                                PrintCenteredAndSpeak($"HAL: Password strength is {verdict}.");
+                                Console.WriteLine(); // spacing
+                                PrintCentered("[1] Accept password");
+                                PrintCentered("[2] Try a different one");
+                                PrintCentered("[3] Back");
+                                WriteBottomPrompt();
+                                string acceptChoice = Console.ReadLine();
+
+                                if (acceptChoice == "1")
+                                {
+                                    safeModePassword = customPassword;
+                                    Speak("Password accepted. Returning to login.");
+                                    Thread.Sleep(3000);
+                                    return; // back to login
+                                }
+                                else if (acceptChoice == "2")
+                                {
+                                    continue; // Loop back to password input
+                                }
+                                else if (acceptChoice == "3")
+                                {
+                                    break; // Exit to main menu
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid choice. Please try again.");
+                                    Thread.Sleep(1500);
+                                }
+
                             }
+
+                            
                         }
                     }
                     // Option 2: Generate password with fancy UI
@@ -657,11 +669,9 @@ using System.Text;
 
                 string appleScriptPath = "/tmp/open_hal.scpt";
                 File.WriteAllText(appleScriptPath,
-                $"tell application \"iTerm\"\n" +
-                $"  create window with default profile\n" +
-                $"  tell current session of current window\n" +
-                $"    write text \"{shellPath}\"\n" +
-                $"  end tell\n" +
+                $"tell application \"Terminal\"\n" +
+                $"  do script \"{shellPath}\"\n" +
+                $"  activate\n" +
                 $"end tell");
 
 
@@ -1481,7 +1491,7 @@ using System.Text;
                                 PrintCenteredAndSpeak("HAL: Playing your favourite music.\n");
                                 Thread.Sleep(2000);
                                 // Write the loop to a shell script
-                                File.WriteAllText(scriptFile, "#!/bin/bash\nwhile true; do afplay turbanLoop.wav; done");
+                                File.WriteAllText(scriptFile, "#!/bin/bash\nwhile true; do afplay assets/turbanLoop.wav; done");
 
                                 // Make it executable
                                 System.Diagnostics.Process.Start("bash", $"-c \"chmod +x {scriptFile}\"");

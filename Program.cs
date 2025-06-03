@@ -1491,10 +1491,16 @@ using System.Text;
                                 PrintCenteredAndSpeak("HAL: Playing your favourite music.\n");
                                 Thread.Sleep(2000);
                                 // Write the loop to a shell script
-                                File.WriteAllText(scriptFile, "#!/bin/bash\nwhile true; do afplay assets/turbanLoop.wav; done");
+                                File.WriteAllText(scriptFile, "#!/bin/bash\nwhile true; do afplay Assets/turbanLoop.wav; done");
+                                //File.WriteAllText(scriptFile, "#!/bin/bash\nwhile true; do afplay \"" + Path.GetFullPath("Assets/turbanLoop.wav") + "\"; done");
+                                //File.WriteAllText(scriptFile, "#!/bin/bash\nwhile true; do afplay turbanLoop.wav; done");
+                                string audioPath = Path.GetFullPath("Assets/turbanLoop.wav");
+                                //Console.WriteLine("DEBUG: audioPath = " + audioPath);
+                                File.WriteAllText(scriptFile, $"#!/bin/bash\nwhile true; do afplay \"{audioPath}\"; done");
+
 
                                 // Make it executable
-                                System.Diagnostics.Process.Start("bash", $"-c \"chmod +x {scriptFile}\"");
+                            System.Diagnostics.Process.Start("bash", $"-c \"chmod +x {scriptFile}\"");
 
                                 // Launch with nohup and capture its PID
                                 string cmd = $"nohup {scriptFile} > /dev/null 2>&1 & echo $! > {pidFile}";
